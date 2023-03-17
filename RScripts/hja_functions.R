@@ -49,7 +49,7 @@ get_latest <- function (coll_name) {
     }
 
 get_latest_stash <- function() {
-    stash <- get_latest(coll_name)
+    stash <- get_latest(stash_name)
     return (stash)
 }
 
