@@ -1,6 +1,6 @@
 library(testthat)
 library(dplyr)
-
+library(purrr)
 source("./RScripts/hja_functions.R")
 
 
@@ -28,18 +28,17 @@ test_that("Insert and retrieve googlesheet data in MongoDB", {
     expect_is(mongo_df, "data.frame")
     expect_equal(mongo_df$CUSTOMER_NAME, test_df$CUSTOMER_NAME)
 })
- 
-sales_data <- test_df |>
-    group_by((SALES_PERSON)) |>
-    summarise(
-        filter(Is_this_a_sale_or_a_prospective_customer == 'SALE'),
-        sales = n(),
-        `500ml` = sum(`_500ml_bottles`),
-        `1l` = sum(`_1_litre_bottles`),
-        `5l` = sum(`_5_litre_bottles`),
-        total_litres = sum ( 0.5*`500ml`, `1l`, 5*`5l`, na.rm=TRUE),
-        payments = sum(Payment_made),
-        deferred_payments = sum (Amount_left_to_pay),
-        total_value = sum(payments, deferred_payments)
 
-        )
+test_that("create sales summary from data", {
+    sales <<- get_sales_data(test_df)
+    expect_equal( sales[sales$SALES_PERSON=="Sales One", "sales"][[1]], 2)
+
+    write_sales_xl(sales)
+})
+
+test_that("create crops summsary from gsheet", {
+    crops <<- get_crops_data(test_df)
+    expect_equal( crops[crops$Crop=="Cocoa", "All acreages"][[1]], 2)
+})
+
+write_to_excel( sales, crops, test_df)

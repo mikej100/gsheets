@@ -1,5 +1,6 @@
 library(googlesheets4)
 library(mongolite)
+library(openxlsx)
 library(dplyr)
 library(jsonlite)
 library(stringr)
@@ -54,6 +55,80 @@ get_latest_stash <- function() {
 }
 
 
+get_sales_data <- function (sales_df) {
+    result <- sales_df  |>
+        group_by(SALES_PERSON)|>
+        summarise(
+            sales = sum(Is_this_a_sale_or_a_prospective_customer == "SALE"),
+            prospects = sum(Is_this_a_sale_or_a_prospective_customer == "PROSPECT"),
+            `500ml` = sum(`_500ml_bottles`),
+            `1l` = sum(`_1_litre_bottles`),
+            `5l` = sum(`_5_litre_bottles`),
+            total_litres = sum ( 0.5*`500ml`, `1l`, 5*`5l`, na.rm=TRUE),
+            payments = sum(Payment_made),
+            deferred_payments = sum (Amount_left_to_pay),
+            total_value = sum(payments)
+        )
+
+}
+
+write_sales_xl <- function (df) {
+    wb <- createWorkbook()
+    addWorksheet(wb, "Sales")
+    writeData(wb, "Sales", df, startCol=2, startRow=3, rownames+TRUE)
+    saveWorkbook(wb, "data\\SalesData.xlsx", overwrite = TRUE)
+}
+get_crops_data <- function (df) {
+
+    area_patterns <- list(".", "less", "1-2", "3")
+    area_names <- list("All acreages", "Under 1 acre", "1-2 acres", "Above 2 acres")
+    crop_data <-  df  |>
+        select (starts_with("Crops_grown_with"))
+    names(crop_data) = str_match(names(crop_data), "_OFA_(\\w+)")[,2]
+
+    count_size  <- function (data, size_pattern) {
+        result <- map_int(data, ~ (sum(str_detect(.x, size_pattern), na.rm=TRUE)))
+        return(as.data.frame(result))
+    }
+#    count_size2  <- function (data, size_pattern, area_name) {
+#        !!area_name <- map_int(data, ~ (sum(str_detect(.x, size_pattern), na.rm=TRUE)))
+#        return(as.data.frame(!!area_name))
+#    }
+    #size_counts2 <- map2( area_patterns, area_names, ~ count_size2(crop_data,  .x, .y))  |>
+
+    size_counts <- map( area_patterns,  ~ count_size(crop_data, .x))  |>
+        list_cbind() 
+    names(size_counts) = area_names
+    size_counts <- size_counts  |>
+        mutate(Crop = names(crop_data), .before=1)
+
+    return(size_counts)
+}
+
+
+write_to_excel <- function (sales, crops, gsheet) {
+    wb <- createWorkbook()
+
+    add_sheet <- function(ws_name, df){
+        addWorksheet(wb, ws_name)
+        writeData(wb, ws_name, df, startCol=1, startRow=1, rownames+TRUE)
+    }
+    add_sheet("Sales", sales)
+    add_sheet("Crops", crops)
+    add_sheet("Google sheet", gsheet)
+#     ws_name <- "Sales"
+#     addWorksheet(wb, ws_name)
+# 
+#     ws_name <- "Crops"
+#     addWorksheet(wb, ws_name)
+#     writeData(wb, ws_name, crops, startCol=2, startRow=3, rownames+TRUE)
+# 
+#     ws_name <- "Google_sheet"
+#     addWorksheet(wb, ws_name)
+#    writeData(wb, ws_name, gsheet, startCol=2, startRow=3, rownames+TRUE)
+
+    saveWorkbook(wb, "data\\SalesData.xlsx", overwrite = TRUE)
+}
 # Return date in YYYYMMDDTHHMM format.
 iso_datetime_short <- function () {
   format(Sys.time(), "%Y%m%dT%H%M")
