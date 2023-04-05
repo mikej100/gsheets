@@ -5,6 +5,7 @@ library(dplyr)
 library(jsonlite)
 library(stringr)
 library(vctrs)
+library(purrr)
 
 stash_name <- "gsheet_archive"
 
@@ -17,8 +18,13 @@ mongo_url <- Sys.getenv(("MONGO_CONN_STRING"))
 #' 
 
 fetch_gsheet <-function(gsheet_url) {
-    df <- read_sheet(gsheet_url, .name_repair = "unique")
-    orig_names <- names(df)
+  
+  gs4_deauth()
+  options(gargle_verbosity = "debug")
+  gs4_auth(path =  ".secrets/hja-001-api-key.json")
+  
+  df <- read_sheet(gsheet_url, .name_repair = "unique")
+  orig_names <- names(df)
     new_names <- orig_names |>
         vec_as_names( repair="universal", quiet=TRUE ) |>
         str_replace_all( "\\.", "_") |>
