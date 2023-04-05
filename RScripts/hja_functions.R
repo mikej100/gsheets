@@ -1,5 +1,6 @@
 library(googlesheets4)
 library(mongolite)
+library(logger)
 library(openxlsx)
 library(dplyr)
 library(jsonlite)
@@ -122,18 +123,12 @@ write_to_excel <- function (sales, crops, gsheet) {
     add_sheet("Sales", sales)
     add_sheet("Crops", crops)
     add_sheet("Google sheet", gsheet)
-#     ws_name <- "Sales"
-#     addWorksheet(wb, ws_name)
-# 
-#     ws_name <- "Crops"
-#     addWorksheet(wb, ws_name)
-#     writeData(wb, ws_name, crops, startCol=2, startRow=3, rownames+TRUE)
-# 
-#     ws_name <- "Google_sheet"
-#     addWorksheet(wb, ws_name)
-#    writeData(wb, ws_name, gsheet, startCol=2, startRow=3, rownames+TRUE)
-
-    saveWorkbook(wb, "data\\SalesData.xlsx", overwrite = TRUE)
+    
+    log_info("Saving excel file")
+    
+    result <- saveWorkbook(wb, ".\\data\\SalesData.xlsx", overwrite = TRUE,
+                           returnValue = TRUE)
+    log_info("Saving excel file result: {result}")
 }
 # Return date in YYYYMMDDTHHMM format.
 iso_datetime_short <- function () {
