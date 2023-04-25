@@ -8,13 +8,13 @@ source("RScripts/hja_functions.R")
 
 ui <- fluidPage(
   #kjselectInput("dataset", label="Dataset", choices = ls("package::datasets") ),
-  titlePanel("HJA Sales form data report - DEV0.1"),
+  titlePanel("HJA Sales form data report - dev0.2"),
   
 #  sidebarPanel( ), 
 
   mainPanel(
     selectInput("dataset", label="Dataset", choices = c("Sales", "Crops") ),
-    downloadButton("downloadData", "Download"),
+    downloadButton("downloadData", "Download full data"),
     
     
     verbatimTextOutput("summary"),
