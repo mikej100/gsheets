@@ -1,3 +1,5 @@
 /logs
 /renv
 .Rproj.user
+/.secrets
+/data

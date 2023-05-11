@@ -22,7 +22,8 @@ fetch_gsheet <-function(gsheet_url) {
   
   gs4_deauth()
   options(gargle_verbosity = "debug")
-  gs4_auth(path =  ".secrets/hja-001-api-key.json")
+  # gs4_auth(path =  ".secrets/hja-001-api-key.json")
+  gs4_auth(path =  cfg$gs4_auth_path)
   
   df <- read_sheet(gsheet_url, .name_repair = "unique")
   orig_names <- names(df)

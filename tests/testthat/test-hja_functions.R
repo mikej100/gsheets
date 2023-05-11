@@ -2,6 +2,7 @@ library(testthat)
 library(dplyr)
 library(purrr)
 source("./RScripts/hja_functions.R")
+source("./RScripts/config.R")
 
 
 gsheet_url <-"https://docs.google.com/spreadsheets/d/1i3xAVax8JWvL8iNcU28QNP3ErnkvdIDT_iXAXRDd7OM/edit?resourcekey#gid=426554005"
