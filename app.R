@@ -5,6 +5,7 @@ library(logger)
 # source("RScripts/ui.R")
 # source("RScripts/server.R")
 source("RScripts/hja_functions.R")
+source("RScripts/config.R")
 
 ui <- fluidPage(
   #kjselectInput("dataset", label="Dataset", choices = ls("package::datasets") ),
@@ -25,7 +26,8 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
    
-  gsheet_url <- "https://docs.google.com/spreadsheets/d/1o_m0_WYgxvar2eLgUlTYNHwLEjRTuBy0U_yd1X-eSrI/edit?resourcekey#gid=1954067065"
+  # gsheet_url <- "https://docs.google.com/spreadsheets/d/1o_m0_WYgxvar2eLgUlTYNHwLEjRTuBy0U_yd1X-eSrI/edit?resourcekey#gid=1954067065"
+  gsheet_url <- cfg$gsheet_url
   data <- fetch_gsheet(gsheet_url)
   Sales <- get_sales_data(data)
   Crops <- get_crops_data(data)
