@@ -3,6 +3,8 @@ Utility to process Google Sheets data and produce digested set of data in Excel 
 
 The utility is accessed by the user as a ShinyApp. Data is retreived from a pre-defined Google Sheet and presented in two summary
 forms: one for sales and one for crops. The use can download an excel spreadsheet containing the two reports as well as the raw data.
+This has been developed for a sales and stock control utility for small business using free-to-use software. The Google Sheets data is 
+updated by field staff using Google Forms or FormBox mobile app when off-network.
 
 Installation
 ============
